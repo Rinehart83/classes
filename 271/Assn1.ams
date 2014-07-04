@@ -1,0 +1,173 @@
+TITLE  Programming Assignment #1   (Assn1.asm)
+
+; Author:  Matt Rinehart
+; CS 271 / Assignment 1        
+; Date:  07-04-2014
+; Description:  A program that takes in user input numbers and calculates
+;				the sum, difference, product, quotient and remainder and
+;				displays the results to the user.  
+
+INCLUDE Irvine32.inc
+
+.data 
+intro	BYTE 	"*****  Programming Assignment #1 -- Matt Rinehart  *****",0 
+inst1	BYTE 	"Please enter two numbers and I'll show you the sum,",\
+				" difference, product, quotient, and remainder.",0 
+inst2	BYTE	"   Enter the first number: ",0
+inst3 	BYTE	"   Enter the second number: ",0 
+err1	BYTE 	"That is not a valid integer, please try again: ",0 
+ans1	BYTE	"The sum is: ",0 
+ans2	BYTE 	"The difference is: ",0 
+ans3	BYTE 	"The product is: ",0 
+ans4 	BYTE 	"And the quotient is ",0 
+ans5 	BYTE 	" with a remainder of ",0 
+again	BYTE	"Enter zero [0] to quit the program, or one [1] to try again. ",0 
+bye 	BYTE	"Thank You, Good Bye!",0 
+
+num1	DWORD 	?
+num2	DWORD 	? 
+sum		DWORD	?
+diff 	DWORD	?
+prod 	DWORD	?
+quo 	DWORD	?
+rem 	DWORD	?
+
+
+
+
+.code
+main PROC
+
+; Introduction
+	mov 	edx, OFFSET intro
+	call	WriteString
+	call 	Crlf
+	call	Crlf 
+	mov 	edx, OFFSET inst1 
+	call	WriteString
+	call 	Crlf 
+	call 	Crlf 
+	
+	
+; Get the data
+	againLoop:
+	mov 	edx, OFFSET inst2 
+	call	WriteString 
+	call 	ReadInt
+	mov 	num1, eax
+	
+	mov 	edx, OFFSET inst3 
+	call	WriteString 
+	call	ReadInt
+	mov 	num2, eax 
+	call 	Crlf 
+	
+
+; Calculate the required values
+	
+	;To calculate the sum:
+		mov 	eax, num1
+		mov 	ebx, num2 
+		add 	eax, ebx 
+		mov 	sum, eax 	
+		
+	;To calculate the difference:
+		mov 	eax, num1
+		mov 	ebx, num2 
+		;cmp 	eax, ebx			//Commented out to show negative numbers 
+		;jl 	num2FirstDiff		//Commented out to show negative numbers 
+		
+		mov 	eax, num1 
+		mov 	ebx, num2 
+		sub 	eax, ebx 
+		mov		diff, eax 
+		jmp 	exitDiff
+		
+		num2FirstDiff:
+			mov 	eax, num2 
+			mov 	ebx, num1
+			sub 	eax, ebx  
+			mov 	diff, eax 
+			
+		exitDiff:
+		
+	;To calculate the product:
+		mov 	eax, num1
+		mov 	ebx, num2 
+		mov 	edx, 0 
+		imul 	ebx 
+		mov 	prod, eax 
+		
+	;To calculate the quotient and remainder:
+		mov 	eax, num1 
+		mov 	ebx, num2 
+		;cmp 	eax, ebx				//commented out after changing to signed division
+		;jl 		num2FirstQuo		//commented out after changing to signed division 
+		
+		cdq
+		idiv 	ebx 
+		mov		quo, eax 
+		mov 	rem, edx 
+		jmp 	exitQuo 
+		
+		num2FirstQuo:
+			mov 	ecx, eax 
+			mov 	eax, ebx
+			mov 	ebx, ecx
+			div 	ebx  
+			mov 	quo, eax
+			mov 	rem, edx 
+		
+		exitQuo:	
+		
+
+; Display the results
+	mov 	edx, OFFSET ans1
+	call 	WriteString
+	mov 	eax, sum 
+	call	WriteInt 
+	call 	Crlf 
+	
+	mov 	edx, OFFSET ans2
+	call 	WriteString
+	mov 	eax, diff 
+	call	WriteInt 
+	call 	Crlf 
+	
+	mov 	edx, OFFSET ans3
+	call 	WriteString
+	mov 	eax, prod   
+	call	WriteInt 
+	call 	Crlf 
+	
+	mov 	edx, OFFSET ans4
+	call 	WriteString
+	mov 	eax, quo   
+	call	WriteInt 
+
+	mov 	edx, OFFSET ans5
+	call 	WriteString
+	mov 	eax, rem  
+	call	WriteInt 
+	call 	Crlf 
+	Call	Crlf 
+	
+
+; Say goodbye (or try again)
+	mov 	edx, OFFSET again 
+	call	WriteString 
+	call	ReadInt 
+	cmp 	eax, 0 
+	jne		againLoop
+	
+	call 	Crlf 
+	mov 	edx, OFFSET bye 
+	call	WriteString 
+	call	Crlf 
+	
+	exit	; exit to operating system
+main ENDP
+
+; (insert additional procedures here)
+
+END main
